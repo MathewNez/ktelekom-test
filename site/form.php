@@ -3,12 +3,23 @@
     $connection = mysqli_connect(localhost, '', '', 'hardware'); //TODO make the password translation more secure
     // check the connection
     if(!$connection) {
-        echo 'Connection error: ' . mysqli_connect_error(); //only for developing process
+        echo 'Connection error: ' . mysqli_connect_error(); //only for developing process, remove before production
     }
 
     if(isset($_POST['submit'])) {
-        echo $_POST['serial_number'];
-        echo $_POST['type'];
+        $sn = mysqli_real_escape_string($connection, $_POST['serial_number']);
+        $type = mysqli_real_escape_string($connection, $_POST['type']);
+        $query = "SELECT id FROM hw_type WHERE hw_type='$type'";
+        $result = mysqli_query($connection, $query);
+        $type_id = mysqli_fetch_all($result, MYSQLI_ASSOC)[0][id];
+        mysqli_free_result($result);
+        $query = "INSERT INTO hw_actual(type_id,serial_number) VALUES ('$type_id', '$sn')";
+        if(mysqli_query($connection, $query)) {
+            echo 'Item was successfully added to a database.';
+        } else {
+            echo 'Error adding values to the database: ' . mysqli_error(); // only for development process, remove before production
+        }
+
     }
 ?>
 
