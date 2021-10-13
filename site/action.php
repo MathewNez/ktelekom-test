@@ -1,4 +1,3 @@
-Вы только что добавили серийный номер <?php echo htmlspecialchars($_POST['serial_number']); ?>
-Устройства <?php echo $_POST['type']; ?> .
-
+Вы только что добавили серийный номер <?php echo htmlspecialchars($_POST['serial_number']); ?> <br> Устройства <?php echo $_POST['type']; ?> .
+<br>
 На самом деле нет, но это только начало разработки и парить это никого не должно.
