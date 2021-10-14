@@ -1,4 +1,4 @@
 # JetBrains files
 .idea/
 # Configurationf files
-site/db.ini
+db.ini
