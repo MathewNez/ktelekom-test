@@ -7,18 +7,16 @@
     if(!$connection) {
         echo 'Connection error: ' . mysqli_connect_error(); //only for developing process, remove before production
     }
+    $hw_types = ['Не выбрано', 'TP-Link TL-WR74', 'D-Link DIR-300', 'D-Link DIR-300 S'];
     // initialise assoc array for possible error messages
     $errors = array('serial_number'=>'', 'hardware_type'=>'');
+    $status = '';   //setting the status variable in order to store status of the operation to echo it at the end of form
 
     // check if submit button was pressed
     if(isset($_POST['submit'])) {
         // initialising variables for data received from form
         $sn = '';
         $type = '';
-
-        // regexp for tplink /^[0-9A-Z]{2}[A-Z]{5}[0-9A-Z][A-Z]{2}$/
-        // regexp for dlink /^[0-9][0-9A-Z]{2}[A-Z]{2}[0-9A-Z][-_@][0-9A-Z][a-z]{2}$/
-        // regexp for dlink s /^[0-9][0-9A-Z]{2}[A-Z]{2}[0-9A-Z][-_@][0-9A-Z]{3}$/
 
         // check if type was not selected
         if($_POST['type'] == 'Не выбрано') {
@@ -35,9 +33,10 @@
         if (empty($_POST['serial_number'])) {
             $errors['serial_number'] = 'A serial number is required';
         } else {
-            $sn = mysqli_real_escape_string($connection, $_POST['serial_number']);
             if(!preg_match($sn_mask, $sn)) {    // check for matching the regexp
                 $errors['serial_number'] = 'Serial number must match the current hardware type mask!';
+            } else {
+                $sn = mysqli_real_escape_string($connection, $_POST['serial_number']);
             }
         }
         // make a query to a db to get the id of current type
@@ -49,7 +48,6 @@
         // generating a query to insert a new record to a db
         $query = "INSERT INTO hw_actual(type_id,serial_number) VALUES ('$type_id', '$sn')";
 
-        $status = '';   //setting the status variable in order to store status of the operation to echo it at the end of form
         if(mysqli_query($connection, $query)) {
             $status = 'Item was successfully added to a database.';
         } else {
@@ -67,14 +65,23 @@
 </head>
 <body>
 <form action="form.php" method="post">
-    <label>Серийный номер: <input type="text" name="serial_number" /> </label>
+    <label>Серийный номер: <input type="text" name="serial_number" value="<?php echo $_POST['serial_number']; ?>" /> </label>
     <div class="red-text"><?php echo $errors['serial_number']; ?></div>
-    <label>Тип оборудования: <select name="type" id="types">
+    <!--<label>Тип оборудования: <select name="type" id="types">
             <option selected="selected">Не выбрано</option>
         <option value="TP-Link TL-WR74">TP-Link TL-WR74</option>
         <option value="D-Link DIR-300">D-Link DIR-300</option>
         <option value="D-Link DIR-300 S">D-Link DIR-300 S</option>
-    </select> </label>
+    </select> </label> -->
+
+    <label>Тип оборудования:
+        <select name="type" id="types">
+            <?php foreach ($hw_types as $value) {?>
+            <option value="<?= $value ?>" <?= (isset($_POST['type']) && $_POST['type'] == $value) ? 'selected' : '' ?>><?= $value ?></option>>
+            <?php } ?>
+        </select>
+    </label>
+
     <div class="red-text"><?php echo $errors['hardware_type']; ?></div>
     <p><input type="submit" name="submit" value="Добавить"/></p>
     <div class="red-text"><?php echo $status; ?></div>
