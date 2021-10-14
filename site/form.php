@@ -7,7 +7,7 @@
     if(!$connection) {
         echo 'Connection error: ' . mysqli_connect_error(); //only for developing process, remove before production
     }
-    // Declaring array to fill the drop=down-list
+    // Declaring array to fill the drop-down-list
     $hw_types = ['Не выбрано', 'TP-Link TL-WR74', 'D-Link DIR-300', 'D-Link DIR-300 S'];
     // initialise assoc array for possible error messages
     $errors = array('serial_number'=>'', 'hardware_type'=>'');
@@ -49,14 +49,23 @@
         if(array_filter($errors)) {
 //            echo 'Form contains errors';
         } else {
-            // generating a query to insert a new record to a db
-            $query = "INSERT INTO hw_actual(type_id,serial_number) VALUES ('$type_id', '$sn')";
-            if(mysqli_query($connection, $query)) { //sending a query
-                $status = 'Item was successfully added to a database.';
-                header('Location: form.php');
+            $query = "SELECT EXISTS(SELECT * from hw_actual WHERE serial_number='$sn')";
+            $result = mysqli_query($connection, $query);
+            $is_present = mysqli_fetch_row($result)[0];
+            mysqli_free_result($result);
+            if (!$is_present){  // check for dublicates
+                // generating a query to insert a new record to a db
+                $query = "INSERT INTO hw_actual(type_id,serial_number) VALUES ('$type_id', '$sn')";
+                if(mysqli_query($connection, $query)) { //sending a query
+                    $status = 'Item was successfully added to a database.';
+                  header('Location: form.php');
+                } else {
+                    $status = 'Error adding values to the database: ' . mysqli_error($connection); // only for development process, remove before production
+                }
             } else {
-                $status = 'Error adding values to the database: ' . mysqli_error($connection); // only for development process, remove before production
+                $status = 'There is already one unit in database with this serial number';
             }
+
         }
         mysqli_close($connection);
     }
