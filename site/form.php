@@ -1,6 +1,7 @@
 <?php
+    $config = parse_ini_file('db.ini');
     // connect to a db
-    $connection = mysqli_connect(localhost, '', '', 'hardware'); //TODO make the password translation more secure
+    $connection = mysqli_connect("localhost", $config['username'], $config['password'], $config['db']); //TODO make the password translation more secure
     // check the connection
     if(!$connection) {
         echo 'Connection error: ' . mysqli_connect_error(); //only for developing process, remove before production
@@ -19,7 +20,7 @@
         } else {
             echo 'Error adding values to the database: ' . mysqli_error(); // only for development process, remove before production
         }
-
+        mysqli_close($connection);
     }
 ?>
 
