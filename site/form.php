@@ -7,16 +7,17 @@
     if(!$connection) {
         echo 'Connection error: ' . mysqli_connect_error(); //only for developing process, remove before production
     }
+    // Declaring array to fill the drop=down-list
     $hw_types = ['Не выбрано', 'TP-Link TL-WR74', 'D-Link DIR-300', 'D-Link DIR-300 S'];
     // initialise assoc array for possible error messages
     $errors = array('serial_number'=>'', 'hardware_type'=>'');
     $status = '';   //setting the status variable in order to store status of the operation to echo it at the end of form
-
+    // initialising variables for data received from form
+    $sn = '';
+    $type = '';
     // check if submit button was pressed
     if(isset($_POST['submit'])) {
-        // initialising variables for data received from form
-        $sn = '';
-        $type = '';
+
 
         // check if type was not selected
         if($_POST['type'] == 'Не выбрано') {
@@ -33,10 +34,9 @@
         if (empty($_POST['serial_number'])) {
             $errors['serial_number'] = 'A serial number is required';
         } else {
+            $sn = mysqli_real_escape_string($connection, $_POST['serial_number']);
             if(!preg_match($sn_mask, $sn)) {    // check for matching the regexp
                 $errors['serial_number'] = 'Serial number must match the current hardware type mask!';
-            } else {
-                $sn = mysqli_real_escape_string($connection, $_POST['serial_number']);
             }
         }
         // make a query to a db to get the id of current type
@@ -45,13 +45,18 @@
         $result = mysqli_query($connection, $query);
         $type_id = mysqli_fetch_all($result, MYSQLI_ASSOC)[0]['id'];
         mysqli_free_result($result);
-        // generating a query to insert a new record to a db
-        $query = "INSERT INTO hw_actual(type_id,serial_number) VALUES ('$type_id', '$sn')";
-
-        if(mysqli_query($connection, $query)) {
-            $status = 'Item was successfully added to a database.';
+        // check if form contains any errors
+        if(array_filter($errors)) {
+//            echo 'Form contains errors';
         } else {
-            $status = 'Error adding values to the database: ' . mysqli_error($connection); // only for development process, remove before production
+            // generating a query to insert a new record to a db
+            $query = "INSERT INTO hw_actual(type_id,serial_number) VALUES ('$type_id', '$sn')";
+            if(mysqli_query($connection, $query)) { //sending a query
+                $status = 'Item was successfully added to a database.';
+                header('Location: form.php');
+            } else {
+                $status = 'Error adding values to the database: ' . mysqli_error($connection); // only for development process, remove before production
+            }
         }
         mysqli_close($connection);
     }
@@ -65,7 +70,7 @@
 </head>
 <body>
 <form action="form.php" method="post">
-    <label>Серийный номер: <input type="text" name="serial_number" value="<?php echo $_POST['serial_number']; ?>" /> </label>
+    <label>Серийный номер: <input type="text" name="serial_number" value="<?php echo htmlspecialchars($_POST['serial_number']); ?>" /> </label>
     <div class="red-text"><?php echo $errors['serial_number']; ?></div>
     <!--<label>Тип оборудования: <select name="type" id="types">
             <option selected="selected">Не выбрано</option>
