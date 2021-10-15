@@ -76,29 +76,25 @@
 <head>
     <meta charset="UTF-8">
     <title>Form</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
 </head>
 <body>
-<form action="form.php" method="post">
-    <label>Серийный номер: <input type="text" name="serial_number" value="<?php echo htmlspecialchars($_POST['serial_number']); ?>" /> </label>
-    <div class="red-text"><?php echo $errors['serial_number']; ?></div>
-    <!--<label>Тип оборудования: <select name="type" id="types">
-            <option selected="selected">Не выбрано</option>
-        <option value="TP-Link TL-WR74">TP-Link TL-WR74</option>
-        <option value="D-Link DIR-300">D-Link DIR-300</option>
-        <option value="D-Link DIR-300 S">D-Link DIR-300 S</option>
-    </select> </label> -->
+    <form action="form.php" method="post">
+        <label>Серийный номер: <input type="text" name="serial_number" value="<?php echo htmlspecialchars($_POST['serial_number']); ?>" /> </label>
+        <div class="red-text"><?php echo $errors['serial_number']; ?></div>
+        <label>Тип оборудования:
+            <select name="type" id="types">
+                <?php foreach ($hw_types as $value) {?>
+                <option value="<?= $value ?>" <?= (isset($_POST['type']) && $_POST['type'] == $value) ? 'selected' : '' ?>><?= $value ?></option>>
+                <?php } ?>
+            </select>
+        </label>
 
-    <label>Тип оборудования:
-        <select name="type" id="types">
-            <?php foreach ($hw_types as $value) {?>
-            <option value="<?= $value ?>" <?= (isset($_POST['type']) && $_POST['type'] == $value) ? 'selected' : '' ?>><?= $value ?></option>>
-            <?php } ?>
-        </select>
-    </label>
-
-    <div class="red-text"><?php echo $errors['hardware_type']; ?></div>
-    <p><input type="submit" name="submit" value="Добавить"/></p>
-    <div class="red-text"><?php echo $status; ?></div>
-</form>
+        <div class="red-text"><?php echo $errors['hardware_type']; ?></div>
+        <p><input type="submit" name="submit" value="Добавить"/></p>
+        <div class="red-text"><?php echo $status; ?></div>
+    </form>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js" integrity="sha384-7+zCNj/IqJ95wo16oMtfsKbZ9ccEh31eOz1HGyDuCQ6wgnyJNSYdrPa03rtR1zdB" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js" integrity="sha384-QJHtvGhmr9XOIpI6YVutG+2QOK9T+ZnN4kzFN1RtK3zEFEIsxhlmWl5/YESvpZ13" crossorigin="anonymous"></script>
 </body>
 </html>
