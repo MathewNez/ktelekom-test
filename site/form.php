@@ -85,7 +85,7 @@
         <label>Тип оборудования:
             <select name="type" id="types">
                 <?php foreach ($hw_types as $value) {?>
-                <option value="<?= $value ?>" <?= (isset($_POST['type']) && $_POST['type'] == $value) ? 'selected' : '' ?>><?= $value ?></option>>
+                <option value="<?php echo $value ?>" <?= (isset($_POST['type']) && $_POST['type'] == $value) ? 'selected' : '' ?>><?php echo $value ?></option>>
                 <?php } ?>
             </select>
         </label>
