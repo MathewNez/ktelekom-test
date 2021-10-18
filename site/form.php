@@ -33,7 +33,7 @@ if (isset($_POST['submit']))
     // check if type was not selected
     if ($_POST['type'] == 'Не выбрано')
     {
-        $errors['hardware_type'] = 'Пожалуйста, выберите ';
+        $errors['hardware_type'] = 'Пожалуйста, выберите тип оборудования.';
     }
     else
     {
@@ -45,14 +45,14 @@ if (isset($_POST['submit']))
     //check if serial number is empty
     if (empty($_POST['serial_number']))
     {
-        $errors['serial_number'] = 'A serial number is required';
+        $errors['serial_number'] = 'Нужно ввести серийный номер.';
     }
     else
     {
         $sn = mysqli_real_escape_string($connection, $_POST['serial_number']);
         if (!preg_match($sn_mask, $sn))
         { // check for matching the regexp
-            $errors['serial_number'] = 'Serial number must match the current hardware type mask!';
+            $errors['serial_number'] = 'Серийный номер должен соответствовать маске выбранного типа.';
         }
     }
     // make a query to a db to get the id of current type
@@ -66,16 +66,16 @@ if (isset($_POST['submit']))
             // generating a query to insert a new record to a db
             $query = "INSERT INTO hw_actual(type_id,serial_number) VALUES ('$type_id', '$sn')";
             if (mysqli_query($connection, $query)) { //sending a query
-                $status = 'Item was successfully added to a database.';
+                $status = 'Запись успешно добавлена.';
                 $_POST['serial_number'] = '';
                 $_POST['type'] = 'Не выбрано';
 
             } else {
-                $status = 'Error adding values to the database: ' . mysqli_error($connection); // only for development process, remove before production
+                $status = 'Не удалось добавить данные в базу, подробности: ' . mysqli_error($connection); // only for development process, remove before production
 
             }
         } else {
-            $status = 'There is already one unit in database with this serial number';
+            $status = 'Такая запись в базе уже существует.';
         }
 
     }
