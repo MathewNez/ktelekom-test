@@ -23,6 +23,7 @@ $errors = array(
     'hardware_type' => ''
 );
 $status = ''; //setting the status variable in order to store status of the operation to echo it at the end of form
+$status_color = '';
 // initialising variables for data received from form
 $sn = '';
 $type = '';
@@ -67,15 +68,19 @@ if (isset($_POST['submit']))
             $query = "INSERT INTO hw_actual(type_id,serial_number) VALUES ('$type_id', '$sn')";
             if (mysqli_query($connection, $query)) { //sending a query
                 $status = 'Запись успешно добавлена.';
+                $status_color = 'green-text';
                 $_POST['serial_number'] = '';
                 $_POST['type'] = 'Не выбрано';
 
             } else {
                 $status = 'Не удалось добавить данные в базу, подробности: ' . mysqli_error($connection); // only for development process, remove before production
+                $status_color = 'red-text';
 
             }
         } else {
             $status = 'Такая запись в базе уже существует.';
+            $status_color = 'red-text';
+
         }
 
     }
@@ -92,6 +97,9 @@ if (isset($_POST['submit']))
     <style >
         .red-text {
             color:red;
+        }
+        .green-text {
+            color: green;
         }
         .form-signin {
             width: 100%;
@@ -133,7 +141,7 @@ if (isset($_POST['submit']))
         </div>
 
         <button type="submit" name="submit" class="btn btn-primary">Add</button>
-        <div><?php echo $status; ?></div>
+        <div class="<?php echo $status_color ?>"><?php echo $status; ?></div>
     </form>
     <main>
         <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"
