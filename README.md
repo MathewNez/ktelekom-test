@@ -68,5 +68,4 @@ $ systemctl status mysql
 
 # Plans for the future:
 * Refactor code
-* Make message about successful adding a record to a db possible to see after sending form
-* Make form beautiful via bootstrap
+* Add AJAX for syncing server-side validation and bootstrap form displaying
