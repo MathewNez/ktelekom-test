@@ -1,74 +1,98 @@
 <?php
-    // parse configuration file with data for db connection
-    $config = parse_ini_file('/home/mathew/Documents/work/ktelekom_test_task/ktelekom-test/db.ini');
-    // connect to a db
-    $connection = mysqli_connect("localhost", $config['username'], $config['password'], $config['db']);
-    // check the connection
-    if(!$connection) {
-        echo 'Connection error: ' . mysqli_connect_error(); //only for developing process, remove before production
+// parse configuration file with data for db connection
+$config = parse_ini_file('/home/mathew/Documents/work/ktelekom_test_task/ktelekom-test/db.ini');
+// connect to a db
+$connection = mysqli_connect("localhost", $config['username'], $config['password'], $config['db']);
+// check the connection
+if (!$connection)
+{
+    echo 'Connection error: ' . mysqli_connect_error(); //only for developing process, remove before production
+
+}
+// Declaring array to fill the drop-down-list
+$hw_types = ['Не выбрано', 'TP-Link TL-WR74', 'D-Link DIR-300', 'D-Link DIR-300 S'];
+// initialise assoc array for possible error messages
+$errors = array(
+    'serial_number' => '',
+    'hardware_type' => ''
+);
+$status = ''; //setting the status variable in order to store status of the operation to echo it at the end of form
+// initialising variables for data received from form
+$sn = '';
+$type = '';
+// check if submit button was pressed
+if (isset($_POST['submit']))
+{
+
+    // check if type was not selected
+    if ($_POST['type'] == 'Не выбрано')
+    {
+        $errors['hardware_type'] = 'You should select the hardware type';
     }
-    // Declaring array to fill the drop-down-list
-    $hw_types = ['Не выбрано', 'TP-Link TL-WR74', 'D-Link DIR-300', 'D-Link DIR-300 S'];
-    // initialise assoc array for possible error messages
-    $errors = array('serial_number'=>'', 'hardware_type'=>'');
-    $status = '';   //setting the status variable in order to store status of the operation to echo it at the end of form
-    // initialising variables for data received from form
-    $sn = '';
-    $type = '';
-    // check if submit button was pressed
-    if(isset($_POST['submit'])) {
-
-
-        // check if type was not selected
-        if($_POST['type'] == 'Не выбрано') {
-            $errors['hardware_type'] = 'You should select the hardware type';
-        } else {
-            $type = mysqli_real_escape_string($connection, $_POST['type']);
+    else
+    {
+        $type = mysqli_real_escape_string($connection, $_POST['type']);
+    }
+    //make a query to a db to get the regexp of current hw type
+    $query = "SELECT sn_mask FROM hw_type WHERE hw_type='$type'";
+    $result = mysqli_query($connection, $query);
+    $sn_mask = mysqli_fetch_all($result, MYSQLI_ASSOC) [0]['sn_mask'];
+    mysqli_free_result($result);
+    //check if serial number is empty
+    if (empty($_POST['serial_number']))
+    {
+        $errors['serial_number'] = 'A serial number is required';
+    }
+    else
+    {
+        $sn = mysqli_real_escape_string($connection, $_POST['serial_number']);
+        if (!preg_match($sn_mask, $sn))
+        { // check for matching the regexp
+            $errors['serial_number'] = 'Serial number must match the current hardware type mask!';
         }
-        //make a query to a db to get the regexp of current hw type
-        $query = "SELECT sn_mask FROM hw_type WHERE hw_type='$type'";
+    }
+    // make a query to a db to get the id of current type
+    //TODO make this block as a function in order not to repeat myself
+    $query = "SELECT id FROM hw_type WHERE hw_type='$type'";
+    $result = mysqli_query($connection, $query);
+    $type_id = mysqli_fetch_all($result, MYSQLI_ASSOC) [0]['id'];
+    mysqli_free_result($result);
+    // check if form contains any errors
+    if (array_filter($errors))
+    {
+        //            echo 'Form contains errors';
+
+    }
+    else
+    {
+        $query = "SELECT EXISTS(SELECT * from hw_actual WHERE serial_number='$sn')";
         $result = mysqli_query($connection, $query);
-        $sn_mask = mysqli_fetch_all($result, MYSQLI_ASSOC)[0]['sn_mask'];
+        $is_present = mysqli_fetch_row($result) [0];
         mysqli_free_result($result);
-        //check if serial number is empty
-        if (empty($_POST['serial_number'])) {
-            $errors['serial_number'] = 'A serial number is required';
-        } else {
-            $sn = mysqli_real_escape_string($connection, $_POST['serial_number']);
-            if(!preg_match($sn_mask, $sn)) {    // check for matching the regexp
-                $errors['serial_number'] = 'Serial number must match the current hardware type mask!';
+        if (!$is_present)
+        { // check for dublicates
+            // generating a query to insert a new record to a db
+            $query = "INSERT INTO hw_actual(type_id,serial_number) VALUES ('$type_id', '$sn')";
+            if (mysqli_query($connection, $query))
+            { //sending a query
+                $status = 'Item was successfully added to a database.';
+                //                  header('Location: form.php');
+
+            }
+            else
+            {
+                $status = 'Error adding values to the database: ' . mysqli_error($connection); // only for development process, remove before production
+
             }
         }
-        // make a query to a db to get the id of current type
-        //TODO make this block as a function in order not to repeat myself
-        $query = "SELECT id FROM hw_type WHERE hw_type='$type'";
-        $result = mysqli_query($connection, $query);
-        $type_id = mysqli_fetch_all($result, MYSQLI_ASSOC)[0]['id'];
-        mysqli_free_result($result);
-        // check if form contains any errors
-        if(array_filter($errors)) {
-//            echo 'Form contains errors';
-        } else {
-            $query = "SELECT EXISTS(SELECT * from hw_actual WHERE serial_number='$sn')";
-            $result = mysqli_query($connection, $query);
-            $is_present = mysqli_fetch_row($result)[0];
-            mysqli_free_result($result);
-            if (!$is_present){  // check for dublicates
-                // generating a query to insert a new record to a db
-                $query = "INSERT INTO hw_actual(type_id,serial_number) VALUES ('$type_id', '$sn')";
-                if(mysqli_query($connection, $query)) { //sending a query
-                    $status = 'Item was successfully added to a database.';
-//                  header('Location: form.php');
-                } else {
-                    $status = 'Error adding values to the database: ' . mysqli_error($connection); // only for development process, remove before production
-                }
-            } else {
-                $status = 'There is already one unit in database with this serial number';
-            }
-
+        else
+        {
+            $status = 'There is already one unit in database with this serial number';
         }
-        mysqli_close($connection);
+
     }
+    mysqli_close($connection);
+}
 ?>
 
 <!DOCTYPE html>
