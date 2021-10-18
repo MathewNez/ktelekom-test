@@ -58,35 +58,24 @@ if (isset($_POST['submit']))
     $type_id = mysqli_fetch_all($result, MYSQLI_ASSOC) [0]['id'];
     mysqli_free_result($result);
     // check if form contains any errors
-    if (array_filter($errors))
-    {
-        //            echo 'Form contains errors';
-
-    }
-    else
-    {
+    if (!array_filter($errors)) {
         $query = "SELECT EXISTS(SELECT * from hw_actual WHERE serial_number='$sn')";
         $result = mysqli_query($connection, $query);
         $is_present = mysqli_fetch_row($result) [0];
         mysqli_free_result($result);
-        if (!$is_present)
-        { // check for dublicates
+        if (!$is_present) { // check for dublicates
             // generating a query to insert a new record to a db
             $query = "INSERT INTO hw_actual(type_id,serial_number) VALUES ('$type_id', '$sn')";
-            if (mysqli_query($connection, $query))
-            { //sending a query
+            if (mysqli_query($connection, $query)) { //sending a query
                 $status = 'Item was successfully added to a database.';
-                //                  header('Location: form.php');
+                $_POST['serial_number'] = '';
+                $_POST['type'] = 'Не выбрано';
 
-            }
-            else
-            {
+            } else {
                 $status = 'Error adding values to the database: ' . mysqli_error($connection); // only for development process, remove before production
 
             }
-        }
-        else
-        {
+        } else {
             $status = 'There is already one unit in database with this serial number';
         }
 
