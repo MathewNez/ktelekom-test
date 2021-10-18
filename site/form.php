@@ -1,10 +1,12 @@
 <?php
-function process_query($conn, $query) {
+function process_query($conn, $query)
+{
     $result = mysqli_query($conn, $query);
     $retval = mysqli_fetch_row($result) [0];
     mysqli_free_result($result);
     return $retval;
 }
+
 // parse configuration file with data for db connection
 $config = parse_ini_file('/home/mathew/Documents/work/ktelekom_test_task/ktelekom-test/db.ini');
 // connect to a db
@@ -60,24 +62,31 @@ if (isset($_POST['submit']))
     $query = "SELECT id FROM hw_type WHERE hw_type='$type'";
     $type_id = process_query($connection, $query);
     // check if form contains any errors
-    if (!array_filter($errors)) {
+    if (!array_filter($errors))
+    {
         $query = "SELECT EXISTS(SELECT * from hw_actual WHERE serial_number='$sn')";
         $is_present = process_query($connection, $query);
-        if (!$is_present) { // check for dublicates
+        if (!$is_present)
+        { // check for dublicates
             // generating a query to insert a new record to a db
             $query = "INSERT INTO hw_actual(type_id,serial_number) VALUES ('$type_id', '$sn')";
-            if (mysqli_query($connection, $query)) { //sending a query
+            if (mysqli_query($connection, $query))
+            { //sending a query
                 $status = 'Запись успешно добавлена.';
                 $status_color = 'green-text';
                 $_POST['serial_number'] = '';
                 $_POST['type'] = 'Не выбрано';
 
-            } else {
+            }
+            else
+            {
                 $status = 'Не удалось добавить данные в базу, подробности: ' . mysqli_error($connection); // only for development process, remove before production
                 $status_color = 'red-text';
 
             }
-        } else {
+        }
+        else
+        {
             $status = 'Такая запись в базе уже существует.';
             $status_color = 'red-text';
 
@@ -88,28 +97,34 @@ if (isset($_POST['submit']))
 }
 ?>
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Form</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
-    <style >
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <style>
         .red-text {
-            color:red;
+            color: red;
         }
+
         .green-text {
             color: green;
         }
+
         .form-signin {
             width: 100%;
             max-width: 330px;
             padding: 15px;
             margin: auto;
         }
+
         html, body {
             height: 100%;
         }
+
         body {
             display: flex;
             align-items: center;
