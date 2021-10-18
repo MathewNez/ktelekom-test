@@ -69,3 +69,4 @@ $ systemctl status mysql
 # Plans for the future:
 * Refactor code
 * Add AJAX for syncing server-side validation and bootstrap form displaying
+* Add bootstrap locally
