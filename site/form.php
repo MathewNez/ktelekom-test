@@ -81,11 +81,27 @@
         .red-text {
             color:red;
         }
+        .form-signin {
+            width: 100%;
+            max-width: 330px;
+            padding: 15px;
+            margin: auto;
+        }
+        html, body {
+            height: 100%;
+        }
+        body {
+            display: flex;
+            align-items: center;
+            padding-top: 40px;
+            padding-bottom: 40px;
+            background-color: #f5f5f5;
+        }
     </style>
 </head>
 <body>
-<div class="d-flex justify-content-center align-self-center">
-    <form action="form.php" method="post">
+<main class="form-signin">
+    <form action="form.php" method="post" class="align-items-center">
         <div class="mb-3">
             <label class="form-label">Серийный номер:
                 <input type="text" name="serial_number" class="form-control"
@@ -107,7 +123,7 @@
         <button type="submit" name= "submit" class="btn btn-primary">Add</button>
         <div><?php echo $status; ?></div>
     </form>
-</div>
+<main>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js" integrity="sha384-7+zCNj/IqJ95wo16oMtfsKbZ9ccEh31eOz1HGyDuCQ6wgnyJNSYdrPa03rtR1zdB" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js" integrity="sha384-QJHtvGhmr9XOIpI6YVutG+2QOK9T+ZnN4kzFN1RtK3zEFEIsxhlmWl5/YESvpZ13" crossorigin="anonymous"></script>
 </body>
