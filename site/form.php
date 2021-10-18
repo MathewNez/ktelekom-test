@@ -1,15 +1,7 @@
 <?php
-function process_query($conn, $query, $mode) {
+function process_query($conn, $query) {
     $result = mysqli_query($conn, $query);
-    $retval = [];
-    switch ($mode) {
-        case 'all':
-            $retval = mysqli_fetch_all($result, MYSQLI_ASSOC);
-            break;
-        case 'row':
-            $retval = mysqli_fetch_row($result);
-            break;
-    }
+    $retval = mysqli_fetch_row($result) [0];
     mysqli_free_result($result);
     return $retval;
 }
@@ -49,7 +41,7 @@ if (isset($_POST['submit']))
     }
     //make a query to a db to get the regexp of current hw type
     $query = "SELECT sn_mask FROM hw_type WHERE hw_type='$type'";
-    $sn_mask = process_query($connection, $query, 'all') [0]['sn_mask'];
+    $sn_mask = process_query($connection, $query);
     //check if serial number is empty
     if (empty($_POST['serial_number']))
     {
@@ -65,11 +57,11 @@ if (isset($_POST['submit']))
     }
     // make a query to a db to get the id of current type
     $query = "SELECT id FROM hw_type WHERE hw_type='$type'";
-    $type_id = process_query($connection, $query, 'all') [0]['id'];
+    $type_id = process_query($connection, $query);
     // check if form contains any errors
     if (!array_filter($errors)) {
         $query = "SELECT EXISTS(SELECT * from hw_actual WHERE serial_number='$sn')";
-        $is_present = process_query($connection, $query, 'row') [0];
+        $is_present = process_query($connection, $query);
         if (!$is_present) { // check for dublicates
             // generating a query to insert a new record to a db
             $query = "INSERT INTO hw_actual(type_id,serial_number) VALUES ('$type_id', '$sn')";
