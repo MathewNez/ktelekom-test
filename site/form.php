@@ -1,4 +1,18 @@
 <?php
+function process_query($conn, $query, $mode) {
+    $result = mysqli_query($conn, $query);
+    $retval = [];
+    switch ($mode) {
+        case 'all':
+            $retval = mysqli_fetch_all($result, MYSQLI_ASSOC);
+            break;
+        case 'row':
+            $retval = mysqli_fetch_row($result);
+            break;
+    }
+    mysqli_free_result($result);
+    return $retval;
+}
 // parse configuration file with data for db connection
 $config = parse_ini_file('/home/mathew/Documents/work/ktelekom_test_task/ktelekom-test/db.ini');
 // connect to a db
@@ -27,7 +41,7 @@ if (isset($_POST['submit']))
     // check if type was not selected
     if ($_POST['type'] == 'Не выбрано')
     {
-        $errors['hardware_type'] = 'You should select the hardware type';
+        $errors['hardware_type'] = 'Пожалуйста, выберите ';
     }
     else
     {
@@ -35,9 +49,7 @@ if (isset($_POST['submit']))
     }
     //make a query to a db to get the regexp of current hw type
     $query = "SELECT sn_mask FROM hw_type WHERE hw_type='$type'";
-    $result = mysqli_query($connection, $query);
-    $sn_mask = mysqli_fetch_all($result, MYSQLI_ASSOC) [0]['sn_mask'];
-    mysqli_free_result($result);
+    $sn_mask = process_query($connection, $query, 'all') [0]['sn_mask'];
     //check if serial number is empty
     if (empty($_POST['serial_number']))
     {
@@ -52,17 +64,12 @@ if (isset($_POST['submit']))
         }
     }
     // make a query to a db to get the id of current type
-    //TODO make this block as a function in order not to repeat myself
     $query = "SELECT id FROM hw_type WHERE hw_type='$type'";
-    $result = mysqli_query($connection, $query);
-    $type_id = mysqli_fetch_all($result, MYSQLI_ASSOC) [0]['id'];
-    mysqli_free_result($result);
+    $type_id = process_query($connection, $query, 'all') [0]['id'];
     // check if form contains any errors
     if (!array_filter($errors)) {
         $query = "SELECT EXISTS(SELECT * from hw_actual WHERE serial_number='$sn')";
-        $result = mysqli_query($connection, $query);
-        $is_present = mysqli_fetch_row($result) [0];
-        mysqli_free_result($result);
+        $is_present = process_query($connection, $query, 'row') [0];
         if (!$is_present) { // check for dublicates
             // generating a query to insert a new record to a db
             $query = "INSERT INTO hw_actual(type_id,serial_number) VALUES ('$type_id', '$sn')";
