@@ -46,7 +46,7 @@ $config = parse_ini_file('/home/mathew/Documents/work/ktelekom_test_task/kteleko
 ```
 And replace this filename to `/path/to/dbini/db.ini`, 
 
-where `/path/to/dbini` is a path to a place where tou store your `db.ini`.
+where `/path/to/dbini` is a path to a place where you store your `db.ini`.
 
 8. Start apache2 service:
 ```shell
@@ -67,6 +67,6 @@ $ systemctl status mysql
 ### Congrats! You made it. You can now find site at [127.0.0.1](http://127.0.0.1)
 
 # Plans for the future:
-* Refactor code
+* Refactor code (somehow get rid of nested conditional operators)
 * Add AJAX for syncing server-side validation and bootstrap form displaying
 * Add bootstrap locally
