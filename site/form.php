@@ -105,7 +105,7 @@
         </div>
 
         <button type="submit" name= "submit" class="btn btn-primary">Add</button>
-        <div class="red-text"><?php echo $status; ?></div>
+        <div><?php echo $status; ?></div>
     </form>
 </div>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js" integrity="sha384-7+zCNj/IqJ95wo16oMtfsKbZ9ccEh31eOz1HGyDuCQ6wgnyJNSYdrPa03rtR1zdB" crossorigin="anonymous"></script>
