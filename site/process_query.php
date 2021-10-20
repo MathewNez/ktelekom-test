@@ -14,4 +14,3 @@ function process_query($conn, $query, $mode)
     mysqli_free_result($result);
     return $retval;
 }
-?>
