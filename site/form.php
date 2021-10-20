@@ -32,7 +32,7 @@ if (isset($_POST['submit'])) {
     }
     //make a query to a db to get the regexp of current hw type
     $query = "SELECT sn_mask FROM hw_type WHERE hw_type='$type'";
-    $sn_mask = process_query($connection, $query, 'all');
+    $sn_mask = process_query($connection, $query, 'one');
     //check if serial number is empty
     if (empty($_POST['serial_number'])) {
         $errors['serial_number'] = 'Нужно ввести серийный номер.';
