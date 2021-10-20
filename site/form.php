@@ -49,7 +49,7 @@ if (isset($_POST['submit'])) {
     if (!array_filter($errors)) {
         $query = "SELECT EXISTS(SELECT * from hw_actual WHERE serial_number='$sn')";
         $is_present = process_query($connection, $query, 'one');
-        if (!$is_present) { // check for dublicates
+        if (!$is_present) { // check for duplicates
             // generating a query to insert a new record to a db
             $query = "INSERT INTO hw_actual(type_id,serial_number) VALUES ('$type_id', '$sn')";
             if (mysqli_query($connection, $query)) { //sending a query
@@ -77,6 +77,7 @@ if (isset($_POST['submit'])) {
 <head>
     <meta charset="UTF-8">
     <title>Form</title>
+    <!--suppress SpellCheckingInspection -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
     <link href="style.css" rel="stylesheet">
