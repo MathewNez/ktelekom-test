@@ -1,8 +1,15 @@
 <?php
-function process_query($conn, $query)
-{
+function process_query($conn, $query, $mode) {
     $result = mysqli_query($conn, $query);
-    $retval = mysqli_fetch_row($result) [0];
+    $retval = [];
+    switch ($mode) {
+        case 'all':
+            $retval = mysqli_fetch_all($result);
+            break;
+        case 'one':
+            $retval = mysqli_fetch_row($result) [0];
+            break;
+    }
     mysqli_free_result($result);
     return $retval;
 }
@@ -18,7 +25,9 @@ if (!$connection)
 
 }
 // Declaring array to fill the drop-down-list
-$hw_types = ['Не выбрано', 'TP-Link TL-WR74', 'D-Link DIR-300', 'D-Link DIR-300 S'];
+$query = "SELECT hw_type FROM hw_type";
+$hw_types = process_query($connection, $query, 'all');
+$hw_types = array_merge(Array(0 => Array(0 => 'Не выбрано')), $hw_types);
 // initialise assoc array for possible error messages
 $errors = array(
     'serial_number' => '',
@@ -44,7 +53,7 @@ if (isset($_POST['submit']))
     }
     //make a query to a db to get the regexp of current hw type
     $query = "SELECT sn_mask FROM hw_type WHERE hw_type='$type'";
-    $sn_mask = process_query($connection, $query);
+    $sn_mask = process_query($connection, $query, 'all');
     //check if serial number is empty
     if (empty($_POST['serial_number']))
     {
@@ -60,12 +69,12 @@ if (isset($_POST['submit']))
     }
     // make a query to a db to get the id of current type
     $query = "SELECT id FROM hw_type WHERE hw_type='$type'";
-    $type_id = process_query($connection, $query);
+    $type_id = process_query($connection, $query, 'one');
     // check if form contains any errors
     if (!array_filter($errors))
     {
         $query = "SELECT EXISTS(SELECT * from hw_actual WHERE serial_number='$sn')";
-        $is_present = process_query($connection, $query);
+        $is_present = process_query($connection, $query, 'one');
         if (!$is_present)
         { // check for dublicates
             // generating a query to insert a new record to a db
@@ -148,7 +157,7 @@ if (isset($_POST['submit']))
             <label class="form-label">Тип оборудования:
                 <select name="type" class="form-select">
                     <?php foreach ($hw_types as $value) { ?>
-                        <option value="<?php echo $value ?>" <?= (isset($_POST['type']) && $_POST['type'] == $value) ? 'selected' : '' ?>><?php echo $value ?></option>>
+                        <option value="<?php echo $value[0] ?>" <?= (isset($_POST['type']) && $_POST['type'] == $value[0]) ? 'selected' : '' ?>><?php echo $value[0] ?></option>>
                     <?php } ?>
                 </select>
             </label>
