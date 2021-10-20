@@ -1,20 +1,5 @@
 <?php
-function process_query($conn, $query, $mode)
-{
-    $result = mysqli_query($conn, $query);
-    $retval = [];
-    switch ($mode) {
-        case 'all':
-            $retval = mysqli_fetch_all($result);
-            break;
-        case 'one':
-            $retval = mysqli_fetch_row($result) [0];
-            break;
-    }
-    mysqli_free_result($result);
-    return $retval;
-}
-
+include 'process_query.php';
 // parse configuration file with data for db connection
 $config = parse_ini_file('/home/mathew/Documents/work/ktelekom_test_task/ktelekom-test/db.ini');
 // connect to a db
